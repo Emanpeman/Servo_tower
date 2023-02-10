@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>  <project>
+    <path>$WS_DIR$\iar\blinky_FreeRTOS_pca10100.ewp</path>
+  </project>  <project>
+    <path>$WS_DIR$\iar\blinky_FreeRTOS_pca10056.ewp</path>
+  </project>  <project>
+    <path>$WS_DIR$\iar\blinky_FreeRTOS_pca10040.ewp</path>
+  </project>  <batchBuild/>
+</workspace>
