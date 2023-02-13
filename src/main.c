@@ -56,9 +56,14 @@
 #include "timers.h"
 #include "bsp.h"
 #include "nordic_common.h"
+//#include "nrf_gpiote.h"
 #include "nrf_drv_clock.h"
+#include "nrf_drv_spi.h"
 #include "sdk_errors.h"
 #include "app_error.h"
+
+
+//#incluide "SPI.h"
 
 #if LEDS_NUMBER <= 2
 #error "Board is not equipped with enough amount of LEDs"
@@ -70,6 +75,9 @@
 
 TaskHandle_t  led_toggle_task_handle;   /**< Reference to LED0 toggling FreeRTOS task. */
 TimerHandle_t led_toggle_timer_handle;  /**< Reference to LED1 toggling FreeRTOS timer. */
+
+#define SPI_INSTANCE 0
+
 
 /**@brief LED0 task entry function.
  *
@@ -99,6 +107,37 @@ static void led_toggle_timer_callback (void * pvParameter)
     bsp_board_led_invert(BSP_BOARD_LED_1);
 }
 
+void SPI_task_function()
+{
+  static const nrf_drv_spi_t m_spi_master_0 = NRF_DRV_SPI_INSTANCE(0);
+
+
+  APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
+  nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+    spi_config.ss_pin   = SPI_SS_PIN;
+    spi_config.miso_pin = SPI_MISO_PIN;
+    spi_config.mosi_pin = SPI_MOSI_PIN;
+    spi_config.sck_pin  = SPI_SCK_PIN;
+    //APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_event_handler, NULL));
+
+
+
+    while (!spi_xfer_done)
+          {
+              __WFE();
+          }
+
+          NRF_LOG_FLUSH();
+
+          bsp_board_led_invert(BSP_BOARD_LED_2);
+          nrf_delay_ms(200);
+      }
+
+}
+
+
 int main(void)
 {
     ret_code_t err_code;
@@ -112,6 +151,9 @@ int main(void)
 
     /* Create task for LED0 blinking with priority set to 2 */
     UNUSED_VARIABLE(xTaskCreate(led_toggle_task_function, "LED0", configMINIMAL_STACK_SIZE + 200, NULL, 2, &led_toggle_task_handle));
+
+    /* Create task for SPI */
+    UNUSED_VARIABLE(xTaskCreate(SPI_task_function, "SPI", configMINIMAL_STACK_SIZE + 200, NULL, 1, NULL));
 
     /* Start timer for LED1 blinking */
     led_toggle_timer_handle = xTimerCreate( "LED1", TIMER_PERIOD, pdTRUE, NULL, led_toggle_timer_callback);

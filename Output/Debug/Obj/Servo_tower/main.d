@@ -67,4 +67,9 @@ Output/Debug/Obj/Servo_tower/main.o: \
  ../nRF5_SDK_17.1.0_ddde560/integration/nrfx/legacy/nrf_drv_clock.h \
  ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/drivers/include/nrfx_clock.h \
  ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/hal/nrf_clock.h \
- ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/drivers/include/nrfx_power_clock.h
+ ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/drivers/include/nrfx_power_clock.h \
+ ../nRF5_SDK_17.1.0_ddde560/integration/nrfx/legacy/nrf_drv_spi.h \
+ ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/drivers/include/nrfx_spim.h \
+ ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/hal/nrf_spim.h \
+ ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/drivers/include/nrfx_spi.h \
+ ../nRF5_SDK_17.1.0_ddde560/modules/nrfx/hal/nrf_spi.h
