@@ -77,6 +77,12 @@ TaskHandle_t  led_toggle_task_handle;   /**< Reference to LED0 toggling FreeRTOS
 TimerHandle_t led_toggle_timer_handle;  /**< Reference to LED1 toggling FreeRTOS timer. */
 
 #define SPI_INSTANCE 0
+#define CHIP_SELECT_PIN 25
+#define MOSI_PIN 20
+#define MISO_PIN 21
+#define SCK_PIN  22
+
+static const nrf_drv_spi_t m_spi_master_0 = NRF_DRV_SPI_INSTANCE(0);
 
 
 /**@brief LED0 task entry function.
@@ -107,34 +113,37 @@ static void led_toggle_timer_callback (void * pvParameter)
     bsp_board_led_invert(BSP_BOARD_LED_1);
 }
 
-void SPI_task_function()
+void SPI_task_function(void)
 {
-  static const nrf_drv_spi_t m_spi_master_0 = NRF_DRV_SPI_INSTANCE(0);
-
+  
+    uint8_t tx_data[] = {0x01, 0x02, 0x03, 0x04};
+    uint8_t rx_data[4];
 
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 
-  nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
-    spi_config.ss_pin   = SPI_SS_PIN;
-    spi_config.miso_pin = SPI_MISO_PIN;
-    spi_config.mosi_pin = SPI_MOSI_PIN;
-    spi_config.sck_pin  = SPI_SCK_PIN;
+    //nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+    //  spi_config.ss_pin   = SPI_SS_PIN;
+    //  spi_config.miso_pin = SPI_MISO_PIN;
+    //  spi_config.mosi_pin = SPI_MOSI_PIN;
+    //  spi_config.sck_pin  = SPI_SCK_PIN;
     //APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_event_handler, NULL));
 
 
+    // Configure the SPI interface
+    nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+    spi_config.ss_pin = CHIP_SELECT_PIN;
+    spi_config.miso_pin = MISO_PIN;
+    spi_config.mosi_pin = MOSI_PIN;
+    spi_config.sck_pin = SCK_PIN;
+    spi_config.frequency = NRF_SPI_FREQ_1M;
+    spi_config.mode = NRF_SPI_MODE_0;
 
-    while (!spi_xfer_done)
-          {
-              __WFE();
-          }
+    // Initialize SPI driver
+    nrf_drv_spi_init();
 
-          NRF_LOG_FLUSH();
-
-          bsp_board_led_invert(BSP_BOARD_LED_2);
-          nrf_delay_ms(200);
-      }
-
+    // Transfer data over SPI
+    nrf_drv_spi_transfer(&spi, tx_data, sizeof(tx_data), rx_data, sizeof(rx_data));
 }
 
 
